@@ -44,8 +44,8 @@
 						</div>
 					</cfif>
 				</cfloop>
-			</cfif>
-<!--- 			<cfif StructKeyExists(data, "syntax") AND Len(data.syntax)>
+			<cfelseif StructKeyExists(data, "syntax") AND Len(data.syntax)>
+				<!--- Support v1 schema --->
 				<p id="syntax">
 					<cfif data.type IS "tag">
 						<small><span class="glyphicon glyphicon-tags" title="Tag Syntax"></span></small> &nbsp;
@@ -80,7 +80,7 @@
 					</cfif>
 				</cfif>
 			</cfif>
-			 --->
+
 			<cfif structKeyExists(data, "engines") AND structKeyExists(data.engines, "coldfusion") AND structKeyExists(data.engines.coldfusion, "deprecated") AND len(data.engines.coldfusion.deprecated)>
 				<div class="alert alert-danger">
 					<h4>
