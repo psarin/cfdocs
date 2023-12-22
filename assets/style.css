@@ -17,8 +17,8 @@ h2 .item-name { font-weight:bold; font-family: Menlo,Monaco,Consolas,"Courier Ne
 .listing a { margin-right: 15px; margin-bottom: 15px; font-size: larger }
 .listing h2 { margin: inherit; font-size: inherit; padding: inherit; border: none; display: inline }
 .listing { text-align: center; }
-#syntax { font-weight:bold; }
-#syntax > code { white-space: pre; padding: 0; }
+#syntax, #headless-syntax { font-weight:bold; }
+#syntax > code, #headless-syntax > code { white-space: pre; padding: 0; }
 #forkme {
   width: 12em;
   height: 12em;
@@ -288,4 +288,21 @@ pre.prettyprint {
 nav.navbar ul.dropdown-menu {
   max-height: 80vh;
   overflow-y: auto;
+}
+
+.d-inline {
+	display: flex;
+    align-items: center;
+	justify-items:end;
+}
+
+.example h4.title {
+	width:100%;
+	margin:0px;
+	margin-left:10px;
+}
+
+
+.example h4.title a {
+	color: #333333;
 }

@@ -15,12 +15,37 @@
 				}
 			}
 		}
+		engineMap = {
+			"coldfusion": {label: "Adobe ColdFusion", abbreviation: "ACF", class: "acf"},
+			"lucee": {label: "Lucee", abbreviation: "Lucee", class: "lucee"},
+			"openbd": {label: "OpenBD", abbreviation: "BD", class: "openbd"},
+			"railo": {label: "Railo", abbreviation: "Railo", class: "railo", display: false}
+		};
 	</cfscript>
 	<div class="jumbotron">
 		<div class="container" data-doc="#encodeForHTMLAttribute(data.name)#">
 			<h1 id="docname">#data.name#</h1>
 			<p>#autoLink(data.description)#</p>
-			<cfif StructKeyExists(data, "syntax") AND Len(data.syntax)>
+			<cfif StructKeyExists(data, "versions") AND isArray(data.versions)>
+				<cfloop array="#data.versions#" item="item">
+					<cfif StructKeyExists(item, "syntax") AND Len(item.syntax)>
+						<div>
+							<p id="#(item.group?:'')#-syntax" class="media-middle" style="display:inline">
+								<code>#trim(Replace(encodeForHTML(item.syntax), Chr(10), "<br>", "ALL"))#</code>
+								<cfif StructKeyExists(item, "returns") AND Len(item.returns)>
+									<code><em>&##8594; <span style="font-weight:normal;" class="small">returns</span> #encodeForHTML(item.returns)#</em></code>
+								</cfif>
+							</p>
+							<cfif StructKeyExists(item, "group") AND Len(item.group)>
+								<cfif data.type neq "tag">
+									<div class="label label-default" style="margin-left:15px;" >#item.group# syntax</div>
+								</cfif>
+							</cfif>
+						</div>
+					</cfif>
+				</cfloop>
+			</cfif>
+<!--- 			<cfif StructKeyExists(data, "syntax") AND Len(data.syntax)>
 				<p id="syntax">
 					<cfif data.type IS "tag">
 						<small><span class="glyphicon glyphicon-tags" title="Tag Syntax"></span></small> &nbsp;
@@ -55,6 +80,7 @@
 					</cfif>
 				</cfif>
 			</cfif>
+			 --->
 			<cfif structKeyExists(data, "engines") AND structKeyExists(data.engines, "coldfusion") AND structKeyExists(data.engines.coldfusion, "deprecated") AND len(data.engines.coldfusion.deprecated)>
 				<div class="alert alert-danger">
 					<h4>
@@ -67,18 +93,11 @@
 					</h4>
 				</div>
 			<cfelseif StructKeyExists(data, "engines") AND structCount(data.engines) EQ 1>
+				<cfset engine = structKeyList(data.engines)>
 				<div class="alert alert-warning">
+
 					This <cfif data.type IS "tag">tag<cfelseif data.type IS "function">function</cfif> requires
-					<cfscript>
-						engineMap = {
-							"coldfusion": "Adobe ColdFusion",
-							"lucee": "Lucee",
-							"openbd": "OpenBD",
-							"railo": "Railo"
-						};
-						engine = structKeyList(data.engines);
-					</cfscript>
-					#engineMap[engine]#<cfif StructKeyExists(data.engines[engine], "minimum_version") AND Len(data.engines[engine].minimum_version)> #data.engines[engine].minimum_version# and up</cfif>.&nbsp;
+					#engineMap[engine]?.label#<cfif StructKeyExists(data.engines[engine], "minimum_version") AND Len(data.engines[engine].minimum_version)> #data.engines[engine].minimum_version# and up</cfif>.&nbsp;
 					<em>Not supported on <cfif engine neq 'lucee'>Lucee, </cfif><cfif engine neq 'coldfusion'>Adobe ColdFusion, </cfif> etc.</em>
 				</div>
 			</cfif>
@@ -102,21 +121,16 @@
 			<cfif Len(cat)><li><a href="#linkTo(cat)#">#application.categories[cat].name#</a></li></cfif>
 			<li class="active">#data.name#</li>
 
-			<cfif StructKeyExists(data, "engines") AND StructKeyExists(data.engines, "coldfusion") AND StructKeyExists(data.engines.coldfusion, "docs") AND Len(data.engines.coldfusion.docs)>
-				<li class="pull-right">
-					<a href="#data.engines.coldfusion.docs#" title="Official Adobe ColdFusion Docs" class="label label-acf">CF<cfif StructKeyExists(data.engines.coldfusion, "minimum_version") AND Len(data.engines.coldfusion.minimum_version)>#encodeForHTML(data.engines.coldfusion.minimum_version)#+</cfif></a>
-				</li>
+			<cfif StructKeyExists(data, "engines")>
+				<cfloop collection="#data.engines#" index="engineName">
+					<cfif StructKeyExists(data.engines[engineName], "docs") AND Len(data.engines[engineName].docs) AND (engineMap[engineName].display?:true)>
+						<li class="pull-right">
+							<a href="#data.engines[engineName].docs#" title="Official #engineMap[engineName]?.label# Docs" class="label label-#engineMap[engineName]?.class#">#engineMap[engineName]?.abbreviation?:''#<cfif StructKeyExists(data.engines[engineName], "minimum_version") AND Len(data.engines[engineName].minimum_version)>#encodeForHTML(data.engines[engineName].minimum_version)#+</cfif></a>
+						</li>
+					</cfif>
+				</cfloop>
 			</cfif>
-			<cfif StructKeyExists(data, "engines") AND StructKeyExists(data.engines, "lucee") AND StructKeyExists(data.engines.lucee, "docs") AND Len(data.engines.lucee.docs)>
-				<li class="pull-right">
-					<a href="#data.engines.lucee.docs#" title="Official Lucee Docs" class="label label-lucee">Lucee<cfif StructKeyExists(data.engines.lucee, "minimum_version") AND Len(data.engines.lucee.minimum_version)>#encodeForHTML(data.engines.lucee.minimum_version)#+</cfif></a>
-				</li>
-			</cfif>
-			<cfif StructKeyExists(data, "engines") AND StructKeyExists(data.engines, "openbd") AND StructKeyExists(data.engines.openbd, "docs") AND Len(data.engines.openbd.docs)>
-				<li class="pull-right">
-					<a href="#data.engines.openbd.docs#" title="Official OpenBD Docs" class="label label-openbd">BD</a>
-				</li>
-			</cfif>
+
 			<cfif structKeyExists(data, "engines") AND NOT structIsEmpty(data.engines)>
 				<li role="separator" class="pull-right divider"></li>
 			</cfif>
@@ -188,6 +202,11 @@
 						</cfif>
 					</h4>
 					<div class="p-desc">
+						<cfif structKeyExists(p, "engines")>
+							<cfloop collection="#p.engines#" index="engineName">
+								#autoLink(engineMap[engineName]?.abbreviation & p.engines[engineName].minimum_version)#
+							</cfloop>
+						</cfif>
 						#autoLink( p.description )#
 						<cfif structKeyExists(p, "values") AND isArray(p.values) AND arrayLen(p.values)>
 							<cfif uCase(arrayToList(p.values)) IS NOT "YES,NO">
@@ -319,30 +338,47 @@
 				</div>
 			</div>
 		</cfif>
+
 		<cfif StructKeyExists(data, "examples") AND IsArray(data.examples) AND ArrayLen(data.examples)>
 			<cfset request.hasExamples = true>
 			<cfset example_index = 0>
 			<cfloop array="#data.examples#" index="ex">
 				<cfset example_index = example_index + 1>
-				<div class="panel panel-default">
-					<div class="panel-heading" role="tab" id="headingOne">
-						<h4 class="panel-title" id="ex#example_index#">
-							<a role="button" data-toggle="collapse" data-parent="##accordion" href="##collapseEx#example_index#" aria-expanded="#example_index lte 5#" aria-controls="collapseEx#example_index#"<cfif example_index gt 5> class="collapsed"</cfif>>
-							  #XmlFormat(ex.title)#
-							</a>
-						</h4>
+				<div class="panel panel-default example">
+					<div class="panel-heading" role="tab" id="headingOne" style="padding:5px;">
+						<div class="panel-title d-inline" id="ex#example_index#">
+							<cfif structKeyExists(ex, "engines") AND !structIsEmpty(ex.engines)>
+								<cfloop collection="#ex.engines#" item="engineName">
+									#autoLink(engineMap[engineName]?.abbreviation & ex.engines[engineName].minimum_version)#
+								</cfloop>
+							</cfif>
+							<h4 class="title">
+								<a role="button" data-toggle="collapse" data-parent="##accordion" href="##collapseEx#example_index#" aria-expanded="#example_index lte 5#" aria-controls="collapseEx#example_index#"<cfif example_index gt 5> class="collapsed"</cfif>>
+								#XmlFormat(ex.title)#
+								</a>
+							</h4>
+							<cfif structKeyExists(ex, "group") AND Len(ex.group)>
+								<div class="pull-right"><span class="label label-default">#ex.group#</span></div>
+							</cfif>
+						</div>
 					</div>
 					<div id="collapseEx#example_index#" class="panel-collapse collapse<cfif example_index lte 5> in</cfif>" role="tabpanel" aria-labelledby="headingOne">
 						<div class="panel-body">
-							<cfif NOT structKeyExists(ex, "runnable") OR ex.runnable>
-								<div class="pull-right">
-									<button class="example-btn btn btn-default" data-name="#encodeForHTMLAttribute(LCase(data.name))#" data-index="#example_index#"><span class="glyphicon glyphicon-play-circle"></span>&nbsp; Run Code</button>
+							<div style="display:flex; align-items:end; justify-items:end;">
+								<cfif structKeyExists(ex, "description") AND Len(ex.description)>
+									<div class="clearfix" style="width:100%; margin-bottom:10px;"><cfif structKeyExists(ex, "engines") AND !structIsEmpty(ex.engines)>#ex.description#<cfelse>#autoLink(ex.description)#</cfif></div>
+								<cfelse>
+									<div class="clearfix" style="width:100%;">&nbsp;</div>
+								</cfif>
+								<cfif NOT structKeyExists(ex, "runnable") OR ex.runnable>
+									<div class="pull-right" style="margin-left:10px;">
+										<button class="example-btn btn btn-default btn-xs" data-name="#encodeForHTMLAttribute(LCase(data.name))#" data-index="#example_index#"><span class="glyphicon glyphicon-play-circle"></span>&nbsp; Run Code</button>
+									</div>
+								</cfif>
+								<div class="pull-right" style="margin-left:10px;">
+									<button class="copy-btn btn btn-default btn-xs" onclick="copyTextToClipboard('code#example_index#')" ><span class="glyphicon glyphicon-copy"></span>&nbsp; Copy Code</button>
 								</div>
-							</cfif>
-								<div class="pull-right" style="margin-right:10px">
-									<button class="copy-btn btn btn-default" onclick="copyTextToClipboard('code#example_index#')" ><span class="glyphicon glyphicon-copy"></span>&nbsp; Copy Code</button>
-								</div>
-							<p class="clearfix">#autoLink(ex.description)#</p>
+							</div>
 							<pre class="prettyprint"><code id="code#example_index#">#encodeForHTML(ex.code)#</code></pre>
 							<cfif StructKeyExists(ex, "result") AND Len(ex.result)>
 								<p><strong>Expected Result: </strong> #encodeForHTML(ex.result)#</p>
