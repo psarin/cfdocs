@@ -145,9 +145,7 @@
 						"title": "Callback Parameters",
 						"description": "When type is function, this represents the parameters for the callback",
 						"type": "array",
-						"$ref": "#/definitions/params",
-						"minItems": 0,
-						"default": []
+						"$ref": "#/definitions/params"
 					},
 					"position": {
 						"title": "Position",
@@ -163,6 +161,133 @@
 					}
 				},
 				"required": ["name", "description", "type", "required"]
+			},
+			"default": []
+		},
+		"versions": {
+			"title": "Versions",
+			"description": "An array of objects describing different versions of the item",
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"title": "Version",
+				"description": "Information about the item for a specific version of it",
+				"type": "object",
+				"properties": {
+					"name": {
+						"title": "Name",
+						"description": "Name of the version",
+						"type": "string"
+					},
+					"group": {
+						"title": "Group",
+						"description": "Name of the group to which this item belongs, e.g., headless, member",
+						"type": "string",
+						"enum": ["", "headless", "member"],
+						"default": ""
+					},
+					"syntax": {
+						"title": "Syntax",
+						"description": "The basic syntax of the item. Start with lowercase",
+						"type": "string",
+						"pattern": "^[a-z]\\w+$",
+						"default": ""
+					},
+					"script": {
+						"title": "Script",
+						"description": "The cfscript version of the item (only applicable for tags).",
+						"type": "string",
+						"default": ""
+					},
+					"returns": {
+						"title": "Return Type",
+						"description": "The return type of the item.",
+						"type": "string",
+						"enum": [
+							"any",
+							"array",
+							"binary",
+							"boolean",
+							"date",
+							"function",
+							"guid",
+							"numeric",
+							"query",
+							"string",
+							"struct",
+							"uuid",
+							"variableName",
+							"void",
+							"xml"
+						],
+						"default": "void"
+					},
+					"examples": {
+						"title": "Examples",
+						"description": "Examples for the item",
+						"type": "array",
+						"$ref": "#/definitions/examples"
+					},
+					"engines": {
+						"title": "Engines",
+						"description": "Engine compatibility information",
+						"type": "object",
+						"$ref": "#/definitions/engines"
+					}
+				},
+				"required": ["name", "returns"]
+			},
+			"default": []
+		},
+		"examples": {
+			"title": "Examples",
+			"description": "A list of examples",
+			"type": "array",
+			"minItems": 0,
+			"items": {
+				"title": "Example",
+				"description": "Information about the example",
+				"type": "object",
+				"properties": {
+					"title": {
+						"title": "Title",
+						"description": "Name of the code example",
+						"type": "string"
+					},
+					"group": {
+						"title": "Group",
+						"description": "Name of the group to which the code example belongs, e.g., headless, member",
+						"type": "string"
+					},
+					"description": {
+						"title": "Description",
+						"description": "Description of the code example",
+						"type": "string"
+					},
+					"code": {
+						"title": "Code",
+						"description": "The example code",
+						"type": "string"
+					},
+					"result": {
+						"title": "Result",
+						"description": "The expected output of the code example",
+						"type": ["string", "boolean", "number"]
+					},
+					"runnable": {
+						"title": "Runnable",
+						"description": "Whether the code is runnable (in trycf for example)",
+						"type": "boolean",
+						"default": true
+					},
+					"testable": {
+						"title": "Testable",
+						"description": "If the example can be tested. May need to set to false if there is a bug on certain engines.",
+						"type": "boolean",
+						"default": true
+					}
+				},
+				"required": ["title", "description", "code"]
 			},
 			"default": []
 		}
@@ -210,9 +335,7 @@
 			"title": "Parameters",
 			"description": "List of parameters",
 			"type": "array",
-			"$ref": "#/definitions/params",
-			"minItems": 0,
-			"default": []
+			"$ref": "#/definitions/params"
 		},
 		"engines": {
 			"title": "Engines",
@@ -252,50 +375,15 @@
 		},
 		"examples": {
 			"title": "Examples",
-			"description": "A list of examples",
+			"description": "Examples for the function",
 			"type": "array",
-			"minItems": 0,
-			"items": {
-				"title": "Example",
-				"description": "Information about the example",
-				"type": "object",
-				"properties": {
-					"title": {
-						"title": "Title",
-						"description": "Name of the code example",
-						"type": "string"
-					},
-					"description": {
-						"title": "Description",
-						"description": "Description of the code example",
-						"type": "string"
-					},
-					"code": {
-						"title": "Code",
-						"description": "The example code",
-						"type": "string"
-					},
-					"result": {
-						"title": "Result",
-						"description": "The expected output of the code example",
-						"type": ["string", "boolean", "number"]
-					},
-					"runnable": {
-						"title": "Runnable",
-						"description": "Whether the code is runnable (in trycf for example)",
-						"type": "boolean",
-						"default": true
-					},
-					"testable": {
-						"title": "Testable",
-						"description": "If the example can be tested. May need to set to false if there is a bug on certain engines.",
-						"type": "boolean",
-						"default": true
-					}
-				},
-				"required": ["title", "description", "code"]
-			},
-			"default": []
+			"$ref": "#/definitions/examples"
+		},
+		"versions": {
+			"title": "Versions",
+			"description": "An array of objects describing different versions of the item",
+			"type": "array",
+			"$ref": "#/definitions/detail"
 		}
 	},
 	"required": ["name", "description", "type"]
