@@ -27,10 +27,26 @@
 			<h1 id="docname">#data.name#</h1>
 			<p>#autoLink(data.description)#</p>
 			<cfif StructKeyExists(data, "versions") AND isArray(data.versions)>
+				<!--- Support v2 schema --->
+				<div class="versions">
 				<cfloop array="#data.versions#" item="item">
 					<cfif StructKeyExists(item, "syntax") AND Len(item.syntax)>
 						<div>
 							<p id="#(item.group?:'')#-syntax" class="media-middle" style="display:inline">
+								<cfif item.group IS "tag">
+									<small><span class="glyphicon glyphicon-tags" title="Tag Syntax"></span></small> &nbsp;
+								<cfelseif data.type EQ "tag" AND item.group IS "script">
+									<cfset data.script = item.syntax>
+									<cfset data.scriptTitle = "Script Syntax">
+									<cfif NOT ListFindNoCase("cfif,cfset,cfelse,cfelseif,cfloop,cfinclude,cfparam,cfswitch,cfcase,cftry,cfthrow,cfrethrow,cfcatch,cffinally,cfmodule,cfcomponent,cfinterface,cfproperty,cffunction,cfimport,cftransaction,cftrace,cflock,cfthread,cfsavecontent,cflocation,cfargument,cfapplication,cfscript", data.name)>
+										<!--- add cfscript syntax --->
+										<cfset data.script = replaceScript(name = data.name, syntax = item.syntax, mode = "other")>
+										<cfset data.scriptTitle = "Script Syntax ACF11+, Lucee, Railo 4.2+">
+									</cfif>
+									<cfif StructKeyExists(data, "script")>
+										<small><span class="glyphicon glyphicon-flash" title="#encodeForHTMLAttribute(data.scriptTitle)#"></span></small> &nbsp;
+									</cfif>
+								</cfif>
 								<code>#trim(Replace(encodeForHTML(item.syntax), Chr(10), "<br>", "ALL"))#</code>
 								<cfif StructKeyExists(item, "returns") AND Len(item.returns)>
 									<code><em>&##8594; <span style="font-weight:normal;" class="small">returns</span> #encodeForHTML(item.returns)#</em></code>
@@ -44,6 +60,7 @@
 						</div>
 					</cfif>
 				</cfloop>
+			</div>
 			<cfelseif StructKeyExists(data, "syntax") AND Len(data.syntax)>
 				<!--- Support v1 schema --->
 				<p id="syntax">
@@ -192,22 +209,41 @@
 			</h2>
 
 			<cfloop array="#data.params#" index="p">
-				<div class="param" id="p-#encodeForHTMLAttribute(p.name)#">
-					<h4>
-						#encodeForHTML(p.name)#
-						<cfif structKeyExists(p, "type") and len( p.type )><em><span class="text-muted">#encodeForHTML(p.type)#</span></em></cfif>
-						<cfif isBoolean(p.required) AND p.required><div class="pull-right"><span class="label label-danger">Required</span></div></cfif>
-						<cfif structKeyExists(p, "default") and len( trim( p.default ) )>
-							<div class="p-default pull-right"><span class="text-muted">Default:</span> <code>#encodeForHTML(p.default)#</code></div>
-						</cfif>
-					</h4>
+				<div class="panel-default param" id="p-#encodeForHTMLAttribute(p.name)#">
+					<div class="panel-heading container-fluid" role="tab">
+						<div class="panel-title d-inline" id="ex#p.name#">
+							<h4 class="title flex-1">
+								#encodeForHTML(p.name)#
+								<cfif structKeyExists(p, "type") and len( p.type )><em><span class="text-muted">#encodeForHTML(p.type)#</span></em></cfif>
+							</h4>
+
+							<h4 class="title">
+								<cfif isBoolean(p.required) AND p.required><div class="pull-right"><span class="label label-danger">Required</span></div></cfif>
+								<cfif structKeyExists(p, "default") and len( trim( p.default ) )>
+									<div class="p-default pull-right"><span class="text-muted">Default:</span> <code>#encodeForHTML(p.default)#</code></div>
+								</cfif>
+							</h4>
+						</div>
+					</div>
+
 					<div class="p-desc">
-						<cfif structKeyExists(p, "engines")>
-							<cfloop collection="#p.engines#" index="engineName">
-								#autoLink(engineMap[engineName]?.abbreviation & p.engines[engineName].minimum_version)#
-							</cfloop>
+						<cfif structKeyExists(p, "description") AND Len(p.description)>
+							<div class="clearfix" style="width:100%; margin-bottom:10px;">
+								#autoLink(p.description)#
+							</div>
+						<cfelse>
+							<div class="clearfix" style="width:100%;">&nbsp;</div>
 						</cfif>
-						#autoLink( p.description )#
+						<cfif structKeyExists(p, "engines") AND !structIsEmpty(p.engines)>
+							<div class="clearfix" style="width:100%; margin-bottom:10px;">
+								<cfloop collection="#p.engines#" item="engineName">
+									<div class="d-inline" style="align-items:start">
+										<div style="margin-right:5px;">#autoLink(engineMap[engineName]?.abbreviation & p.engines[engineName].minimum_version)#</div>
+										<div style="margin-top:2px;">#autoLink(p.engines[engineName]?.notes)#</div>
+									</div>
+								</cfloop>
+							</div>
+						</cfif>
 						<cfif structKeyExists(p, "values") AND isArray(p.values) AND arrayLen(p.values)>
 							<cfif uCase(arrayToList(p.values)) IS NOT "YES,NO">
 								<div>
@@ -352,7 +388,7 @@
 									#autoLink(engineMap[engineName]?.abbreviation & ex.engines[engineName].minimum_version)#
 								</cfloop>
 							</cfif>
-							<h4 class="title">
+							<h4 class="title flex-1">
 								<a role="button" data-toggle="collapse" data-parent="##accordion" href="##collapseEx#example_index#" aria-expanded="#example_index lte 5#" aria-controls="collapseEx#example_index#"<cfif example_index gt 5> class="collapsed"</cfif>>
 								#XmlFormat(ex.title)#
 								</a>
@@ -366,7 +402,7 @@
 						<div class="panel-body">
 							<div style="display:flex; align-items:end; justify-items:end;">
 								<cfif structKeyExists(ex, "description") AND Len(ex.description)>
-									<div class="clearfix" style="width:100%; margin-bottom:10px;"><cfif structKeyExists(ex, "engines") AND !structIsEmpty(ex.engines)>#ex.description#<cfelse>#autoLink(ex.description)#</cfif></div>
+									<div class="clearfix" style="width:100%; margin-bottom:10px;">#autoLink(ex.description)#</div>
 								<cfelse>
 									<div class="clearfix" style="width:100%;">&nbsp;</div>
 								</cfif>
