@@ -69,7 +69,7 @@
 		{
 			"title": "Array Contains",
 			"group": "headless",
-			"description": "Lucee4.5+",
+			"description": "",
 			"code": "someArray = [1,2,3];\nwriteDump(arrayContains(someArray,2));",
 			"result": "2",
             "engines": {
@@ -81,7 +81,7 @@
 		{
 			"title": "Substring Search",
 			"group": "headless",
-			"description": "Lucee4.5+",
+			"description": "",
 			"code": "words = [ 'hello' , 'world' ];\npositionOfSubstring = arrayContains( words, 'el', true );\nwriteDump(positionOfSubstring);",
 			"result": "1",
             "engines": {
@@ -93,7 +93,7 @@
 		{
 			"title": "Array Contains (member function)",
 			"group": "member",
-			"description": "CF10+",
+			"description": "",
 			"code": "someArray = [1,2,3];\nwriteDump(someArray.contains(2));",
 			"result": "true",
             "engines": {
@@ -105,7 +105,7 @@
 		{
 			"title": "Array Contains (member function)",
 			"group": "member",
-			"description": "Lucee4.5+",
+			"description": "",
 			"code": "someArray = [1,2,3];\nwriteDump(someArray.contains(2));",
 			"result": "2",
             "engines": {

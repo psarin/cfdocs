@@ -1,8 +1,6 @@
 {
 	"name": "directoryList",
 	"type": "function",
-	"syntax": "directoryList(path [, recurse] [, listInfo] [, filter] [, sort] [, type])",
-	"returns": "any",
 	"related": [
 		"cfdirectory"
 	],
@@ -41,11 +39,18 @@
 		},
 		{
 			"name": "filter",
-			"description": "File extension filter applied to the listed files, for example, `*.jpg`. \rMultiple filters can be applied by using a pipe delimiter. For example: `*.doc|*.xls`. \rYou can also pass a function. The arguments of the passed function must have: `path` :the file path, `type`: The values (file or dir), `extension`: The file extension, if any, otherwise and empty string. \rThis argument can also accept the instances of Java `FileFilter` Objects. \rIn Lucee4.5+ it can be a closure as well.",
+			"description": "File extension filter applied to the listed files, for example, `*.jpg`. \rMultiple filters can be applied by using a pipe delimiter. For example: `*.doc|*.xls`. \rYou can also pass a function. The arguments of the passed function must have: `path` :the file path, `type`: The values (file or dir), `extension`: The file extension, if any, otherwise and empty string. \rThis argument can also accept the instances of Java `FileFilter` Objects.",
 			"required": false,
 			"default": "",
 			"type": "string",
-			"values": []
+			"values": [],
+			"engines": {
+				"lucee": {
+					"minimum_version": "4.5+",
+					"notes": "The `filter` param can be a closure as well where the path is passed in.",
+					"docs": "https://docs.lucee.org/reference/functions/directorylist.html"
+				}
+			}
 		},
 		{
 			"name": "sort",
@@ -53,11 +58,18 @@
 			"required": false,
 			"default": "",
 			"type": "string",
-			"values": []
+			"values": [],
+			"engines": {
+				"lucee": {
+					"minimum_version": "4.5+",
+					"notes": "The `sort` argument only works when `listInfo=\"query\"`.",
+					"docs": "https://docs.lucee.org/reference/functions/directorylist.html"
+				}
+			}
 		},
 		{
 			"name": "type",
-			"description": "CF11+ Lucee5+ Filter the result to only include files, directories, or both.",
+			"description": "Filter the result to only include files, directories, or both.",
 			"required": false,
 			"default": "all",
 			"type": "string",
@@ -65,12 +77,31 @@
 				"file",
 				"dir",
 				"all"
-			]
+			],
+			"engines": {
+				"coldfusion": {
+					"minimum_version": "11+",
+					"notes": "Only CF11+ supports the type argument.",
+					"docs": "https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-functions/functions-c-d/DirectoryList.html"
+				},
+				"lucee": {
+					"minimum_version": "5+",
+					"docs": "https://docs.lucee.org/reference/functions/directorylist.html"
+				}
+			}
 		}
 	],
+	"versions": [
+        {
+            "name": "directoryList",
+            "group": "script",
+            "returns": "any",
+            "syntax": "directoryList(path [, recurse] [, listInfo] [, filter] [, sort] [, type])"
+        }
+    ],
 	"engines": {
 		"coldfusion": {
-			"minimum_version": "9",
+			"minimum_version": "11",
 			"notes": "Only CF11+ supports the type argument.",
 			"docs": "https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-functions/functions-c-d/DirectoryList.html"
 		},
@@ -121,10 +152,15 @@
 		},
 		{
 			"title": "Filter files with closure",
-			"description": "Lucee4.5+ Pass a closure instead of a string as `filter` param",
+			"description": "Pass a closure instead of a string as `filter` param",
 			"code": "arrayOfFilteredFiles = directoryList(\".\", false, \"name\", function(path) {\n\treturn ListFindNoCase(\"Application.cfc,robots.txt,server.json,favicon.ico,.htaccess,README.md\", path);\n});",
 			"result": "",
-			"runnable": false
+			"runnable": false,
+			"engines": {
+				"lucee": {
+					"minimum_version": "4.5+"
+				}
+			}
 		}
 	]
 }
